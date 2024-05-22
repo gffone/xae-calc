@@ -1,0 +1,11 @@
+meta:
+  environment: golang
+  toolchain:
+    name: go
+    version: 1.22
+build:
+  image: golang:1.22
+run:
+  image: golang:1.22
+  persistenceMount: /data
+  containerPort: 8080

@@ -1,0 +1,77 @@
+body {
+font-family: 'Yandex Sans Display';
+background:  0 0 #ffffff;
+
+}
+
+.help:hover {
+    position: relative;
+    
+}
+
+.bg_body_gr{
+    background-image: url(img/bg_gr.jpg);
+    background-size: cover;
+}
+
+.help:hover:after {
+    content: url(img/graph.gif);
+    display: block;
+    position: absolute;
+    left: -500px;
+    top: -410px;
+    background: rgb(238, 241, 249);
+    box-shadow: 1px 1px 150px 2px rgb(99, 99, 99);
+}
+
+
+.graph{
+    padding-bottom: 20px;
+    
+}
+
+
+.block2{
+    background-image: url(img/bg22.jpg);
+    background-size: cover;
+
+    
+}
+
+.block3{
+    background-image: url(img/bgg.jpg);
+    background-size: cover;
+
+    
+}
+
+.block5{
+    border: 1px solid rgba(255, 255, 255, .2);
+    background: rgba(255, 255 ,255, .4);
+    backdrop-filter: blur(10px);
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+} 
+
+#vid {
+        height: 100vh;
+        object-fit: cover;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: -1;
+    }
+
+
+
+
+
+
+    
+#btn_start_img{
+    width: 70px;
+    height: 70px;
+}
+ 

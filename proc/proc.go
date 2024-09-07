@@ -22,22 +22,22 @@ const TIME_FORMAT = "15:04:05"
 const ABSOLUTE_MINIMUM_NUMBER_OF_SIGNALS = 20
 const PERCENTAGE_OF_DISCRIMINATION_FROM_THE_MAXIMUM_NUMBER_OF_SIGNALS = 10
 
-type LnDurPair struct {
+type lnDurPair struct {
 	lnVal  float64
 	durVal float64
 }
 
-type LnDurPairAprox struct {
+type lnDurPairAprox struct {
 	aproxLnVals  []float64
 	aproxDurVals []float64
 }
 
-type CurrentGroup struct {
+type currentGroup struct {
 	wholeSetOfLnVals  []float64
 	wholeSetOfDurVals []float64
 }
 
-func ProcData() (map[int][]LnDurPair, map[int]int, []int) {
+func procData() (map[int][]LnDurPair, map[int]int, []int) {
 	chanArr := make([]int, 0)
 	dataMap := make(map[int][]LnDurPair)
 	chanNMap := make(map[int]int)
@@ -65,10 +65,10 @@ func ProcData() (map[int][]LnDurPair, map[int]int, []int) {
 		_, ok := dataMap[channel]
 
 		if !ok {
-			lnDurPairArr := make([]LnDurPair, 0, len(cols[0])-1)
+			lnDurPairArr := make([]lnDurPair, 0, len(cols[0])-1)
 			t, _ := time.Parse(TIME_FORMAT, cols[0][i])
 			dur := t.Sub(t0)
-			lnDurPairArr = append(lnDurPairArr, LnDurPair{math.Log(1), dur.Seconds()})
+			lnDurPairArr = append(lnDurPairArr, lnDurPair{math.Log(1), dur.Seconds()})
 			math.Log(float64(len(dataMap[channel])))
 			dataMap[channel] = lnDurPairArr
 			chanNMap[channel] = 1
@@ -76,7 +76,7 @@ func ProcData() (map[int][]LnDurPair, map[int]int, []int) {
 		} else {
 			t, _ := time.Parse(TIME_FORMAT, cols[0][i])
 			dur := t.Sub(t0)
-			dataMap[channel] = append(dataMap[channel], LnDurPair{math.Log(float64(len(dataMap[channel]) + 1)), dur.Seconds()})
+			dataMap[channel] = append(dataMap[channel], lnDurPair{math.Log(float64(len(dataMap[channel]) + 1)), dur.Seconds()})
 			chanNMap[channel]++
 		}
 	}
@@ -85,31 +85,31 @@ func ProcData() (map[int][]LnDurPair, map[int]int, []int) {
 	return dataMap, chanNMap, chanArr
 }
 
-func ProcXae(dataMap map[int][]LnDurPair, start, end float64) (map[int]float64, map[int]LnDurPairAprox) {
+func procXae(dataMap map[int][]lnDurPair, start, end float64) (map[int]float64, map[int]lnDurPairAprox) {
 
 	xaeMap := make(map[int]float64)
-	aproxMap := make(map[int]LnDurPairAprox)
+	aproxMap := make(map[int]lnDurPairAprox)
 
 	for currentChan, lnDurPairArr := range dataMap {
 		tempV := []float64{}
 		tempT := []float64{}
-		for _, LnDurPair := range lnDurPairArr {
-			if LnDurPair.durVal >= start && LnDurPair.durVal <= end {
+		for _, lnDurPair := range lnDurPairArr {
+			if lnDurPair.durVal >= start && lnDurPair.durVal <= end {
 				tempV = append(tempV, LnDurPair.lnVal)
 				tempT = append(tempT, LnDurPair.durVal)
 			}
 		}
-		a, b := LinearTrend(tempT, tempV)
+		a, b := linearTrend(tempT, tempV)
 		xaeMap[currentChan] = a
 
-		aproxLnVals := GenerateAproxLnVals(a, b, tempT)
-		aproxMap[currentChan] = LnDurPairAprox{aproxLnVals, tempT}
+		aproxLnVals := generateAproxLnVals(a, b, tempT)
+		aproxMap[currentChan] = lnDurPairAprox{aproxLnVals, tempT}
 
 	}
 	return xaeMap, aproxMap
 }
 
-func GenerateAproxLnVals(a, b float64, time []float64) []float64 {
+func generateAproxLnVals(a, b float64, time []float64) []float64 {
 	items := make([]float64, 0, len(time))
 	for _, curTime := range time {
 		items = append(items, a*curTime+b)
@@ -118,7 +118,7 @@ func GenerateAproxLnVals(a, b float64, time []float64) []float64 {
 	return items
 }
 
-func GraphImgRender(dataMap map[int][]LnDurPair, xaeMap map[int]float64, aproxMap map[int]LnDurPairAprox) {
+func graphImgRender(dataMap map[int][]LnDurPair, xaeMap map[int]float64, aproxMap map[int]lnDurPairAprox) {
 
 	channelsTotal := len(xaeMap)
 
@@ -168,7 +168,7 @@ func GraphImgRender(dataMap map[int][]LnDurPair, xaeMap map[int]float64, aproxMa
 	}
 }
 
-func LinearTrend(dataT, dataV []float64) (float64, float64) {
+func linearTrend(dataT, dataV []float64) (float64, float64) {
 
 	var sumX, sumY, sumXY, sumXX float64
 
@@ -188,7 +188,7 @@ func LinearTrend(dataT, dataV []float64) (float64, float64) {
 	return slope, intercept
 }
 
-func XaeResult(xaeChanMap map[int]float64, dataMap map[int][]LnDurPair, chanNMap map[int]int, channelsArr []int) {
+func xaeResult(xaeChanMap map[int]float64, dataMap map[int][]LnDurPair, chanNMap map[int]int, channelsArr []int) {
 	var tempN int
 	var tempChannel int
 	var discriminationThreshold int
@@ -234,10 +234,10 @@ func XaeResult(xaeChanMap map[int]float64, dataMap map[int][]LnDurPair, chanNMap
 		nArr = append(nArr, opts.BarData{Value: chanNMap[v]})
 	}
 
-	MakeStandartPage(confirmedСhannelsArr, xaeBarData, nArr)
+	makeStandartPage(confirmedСhannelsArr, xaeBarData, nArr)
 }
 
-func MakeStandartPage(confirmedСhannelsArr []int, xaeBarData []opts.BarData, nArr []opts.BarData) {
+func makeStandartPage(confirmedСhannelsArr []int, xaeBarData []opts.BarData, nArr []opts.BarData) {
 	page := components.NewPage()
 	page.AddCharts(
 		MakeStandartBarChart(confirmedСhannelsArr, xaeBarData),
@@ -250,7 +250,7 @@ func MakeStandartPage(confirmedСhannelsArr []int, xaeBarData []opts.BarData, nA
 	page.Render(io.MultiWriter(f))
 }
 
-func MakeStandartBarChart(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *charts.Bar {
+func makeStandartBarChart(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{
@@ -283,7 +283,7 @@ func MakeStandartBarChart(confirmedСhannelsArr []int, xaeBarData []opts.BarData
 	return bar
 }
 
-func MakeStandartBarChartN(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *charts.Bar {
+func makeStandartBarChartN(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{
@@ -317,11 +317,13 @@ func MakeStandartBarChartN(confirmedСhannelsArr []int, xaeBarData []opts.BarDat
 }
 
 func StandartProc(start, end float64) {
-	dataMap, chanNMap, chanArr := ProcData()
-	xaeMap, aproxMap := ProcXae(dataMap, start, end)
-	GraphImgRender(dataMap, xaeMap, aproxMap)
-	XaeResult(xaeMap, dataMap, chanNMap, chanArr)
-
+	dataMap, chanNMap, chanArr := procData()
+	
+	xaeMap, aproxMap := procXae(dataMap, start, end)
+	
+	graphImgRender(dataMap, xaeMap, aproxMap)
+	
+	xaeResult(xaeMap, dataMap, chanNMap, chanArr)
 }
 
 func GroupModeProc(int_vals [][]int, start, end float64) {
@@ -334,16 +336,16 @@ func GroupModeProc(int_vals [][]int, start, end float64) {
 		fmt.Println(errM)
 	}
 
-	groupArr := make([]CurrentGroup, 0)
+	groupArr := make([]currentGroup, 0)
 
-	dataMap, _, _ := ProcData()
+	dataMap, _, _ := procData()
 
 	for _, chans := range int_vals {
-		var CurrentGroup CurrentGroup
+		var currentGroup currentGroup
 		for _, cur_chan := range chans {
 			for _, v := range dataMap[cur_chan] {
-				CurrentGroup.wholeSetOfDurVals = append(CurrentGroup.wholeSetOfDurVals, v.durVal)
-				CurrentGroup.wholeSetOfLnVals = append(CurrentGroup.wholeSetOfLnVals, v.lnVal)
+				currentGroup.wholeSetOfDurVals = append(currentGroup.wholeSetOfDurVals, v.durVal)
+				currentGroup.wholeSetOfLnVals = append(currentGroup.wholeSetOfLnVals, v.lnVal)
 			}
 		}
 		groupArr = append(groupArr, CurrentGroup)
@@ -354,9 +356,9 @@ func GroupModeProc(int_vals [][]int, start, end float64) {
 		sort.Float64s(v.wholeSetOfLnVals)
 	}
 
-	aproxDataMap := ChangeSignature(groupArr)
+	aproxDataMap := changeSignature(groupArr)
 
-	xae, aproxMap := ProcXae(aproxDataMap, start, end)
+	xae, aproxMap := procXae(aproxDataMap, start, end)
 
 	for i, v := range groupArr {
 
@@ -402,13 +404,13 @@ func GroupModeProc(int_vals [][]int, start, end float64) {
 		xaeBarData = append(xaeBarData, opts.BarData{Value: math.Round((xae[i-1]*1000)*100) / 100})
 		confirmedСhannelsArr = append(confirmedСhannelsArr, i)
 	}
-	MakeGroupPage(confirmedСhannelsArr, xaeBarData)
+	makeGroupPage(confirmedСhannelsArr, xaeBarData)
 }
 
-func MakeGroupPage(confirmedСhannelsArr []int, xaeBarData []opts.BarData) {
+func makeGroupPage(confirmedСhannelsArr []int, xaeBarData []opts.BarData) {
 	page := components.NewPage()
 	page.AddCharts(
-		MakeGroupBarChart(confirmedСhannelsArr, xaeBarData),
+		makeGroupBarChart(confirmedСhannelsArr, xaeBarData),
 	)
 	f, errC := os.Create("web/temp/bar/bar2.html")
 	if errC != nil {
@@ -421,7 +423,7 @@ func MakeGroupPage(confirmedСhannelsArr []int, xaeBarData []opts.BarData) {
 	}
 }
 
-func MakeGroupBarChart(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *charts.Bar {
+func makeGroupBarChart(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{
@@ -452,13 +454,13 @@ func MakeGroupBarChart(confirmedСhannelsArr []int, xaeBarData []opts.BarData) *
 	bar.XYReversal()
 	return bar
 }
-func ChangeSignature(groupArr []CurrentGroup) map[int][]LnDurPair {
+func changeSignature(groupArr []CurrentGroup) map[int][]LnDurPair {
 
-	dataMap := make(map[int][]LnDurPair)
+	dataMap := make(map[int][]lnDurPair)
 
 	for id, v := range groupArr {
 		for i, ln := range v.wholeSetOfLnVals {
-			dataMap[id] = append(dataMap[id], LnDurPair{ln, v.wholeSetOfDurVals[i]})
+			dataMap[id] = append(dataMap[id], lnDurPair{ln, v.wholeSetOfDurVals[i]})
 		}
 	}
 	return dataMap

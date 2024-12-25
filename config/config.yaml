@@ -1,0 +1,6 @@
+static_directory: "./web"
+url: "localhost"
+port: "8080"
+storage_path: "web/storage/temp"
+worksheet_name: "Лист1"
+

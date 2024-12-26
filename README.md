@@ -1,3 +1,4 @@
+# An application for assessing the resource of technical objects by modeling the time-dependent parameters of acoustic emissions.
 
 ![image](https://github.com/user-attachments/assets/028ae2fe-9eee-40b6-86d9-2b21e6b905a8)
 ![image](https://github.com/user-attachments/assets/8d8f78fb-bef9-48e1-b092-8c72335b0978)

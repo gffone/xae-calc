@@ -15,14 +15,14 @@ func main() {
 	log := setupLogger()
 	log.Info("starting app")
 
-	app.StartNewApp(log, cfg)
+	application := app.NewApp(log, cfg)
+	application.StartNewApp()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	log.Info("app started")
 	<-done
-
 	log.Info("app stopped")
 }
 

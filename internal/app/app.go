@@ -7,12 +7,22 @@ import (
 	"proc/internal/storage"
 )
 
-func StartNewApp(log *slog.Logger, cfg *config.Config) {
-	log.Info("create storage")
-	strg := storage.NewStorage(cfg.StoragePath, cfg.WorksheetName)
-	log.Info("storage created")
+type App struct {
+	log *slog.Logger
+	cfg *config.Config
+}
 
-	log.Info("start new server")
-	server.StartNewServer(log, cfg.StaticDir, cfg.Url, cfg.Port, strg)
-	log.Info("server started")
+func NewApp(log *slog.Logger, cfg *config.Config) *App {
+	return &App{log: log, cfg: cfg}
+}
+
+func (a *App) StartNewApp() {
+	a.log.Info("create storage")
+	strg := storage.NewStorage(a.cfg.StoragePath, a.cfg.WorksheetName)
+	a.log.Info("storage created")
+
+	a.log.Info("start new server")
+	srv := server.NewServer(a.log, a.cfg.StaticDir, a.cfg.Url, a.cfg.Port, strg)
+	srv.StartNewServer()
+	a.log.Info("server started")
 }

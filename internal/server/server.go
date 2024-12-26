@@ -18,25 +18,22 @@ type Server struct {
 	strg      *storage.Storage
 }
 
-func StartNewServer(log *slog.Logger, staticDir string, url string, port string, strg *storage.Storage) {
-
-	srv := newServer(log, staticDir, url, port, strg)
-
-	err := srv.initializeFileServer()
-	if err != nil {
-		log.Error(err.Error())
-	}
-
-	err = srv.initializeHandlerFunctions()
-	if err != nil {
-		log.Error(err.Error())
-	}
-
-	srv.listenAndServe()
+func NewServer(log *slog.Logger, staticDir string, url string, port string, strg *storage.Storage) *Server {
+	return &Server{log: log, staticDir: staticDir, url: url, port: port, strg: strg}
 }
 
-func newServer(log *slog.Logger, staticDir string, url string, port string, strg *storage.Storage) *Server {
-	return &Server{log: log, staticDir: staticDir, url: url, port: port, strg: strg}
+func (s *Server) StartNewServer() {
+	err := s.initializeFileServer()
+	if err != nil {
+		s.log.Error(err.Error())
+	}
+
+	err = s.initializeHandlerFunctions()
+	if err != nil {
+		s.log.Error(err.Error())
+	}
+
+	s.listenAndServe()
 }
 
 func (s *Server) initializeFileServer() error {
